@@ -1,0 +1,4556 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Prequel Data Export",
+      "description": "Data Export API spec",
+      "version": "0.1"
+    },
+    "servers": [
+      {
+        "url": "https://api.prequel.co/",
+        "description": "Cloud-hosted server (US)"
+      },
+      {
+        "url": "https://eu-api.prequel.co/",
+        "description": "Cloud-hosted server (Europe)"
+      },
+      {
+        "url": "https://{custom_host}/",
+        "description": "Cloud-prem or shared-cloud server"
+      }
+    ],
+    "security": [
+      {
+        "ApiKeyAuth": []
+      }
+    ],
+    "paths": {
+      "/": {
+        "get": {
+          "summary": "API Status",
+          "security": [],
+          "description": "Ping the prequel API to make sure it is operating",
+          "tags": ["Health"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "number"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "version": {
+                            "type": "string"
+                          },
+                          "health": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/sources": {
+        "get": {
+          "summary": "Get sources",
+          "description": "The Sources endpoint returns the configured data sources. Sources are the databases or data warehouses within the provider environment.",
+          "tags": ["Sources"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "sources": {
+                            "type": "array",
+                            "items": {
+                              "oneOf": [
+                                {
+                                  "$ref": "#/components/schemas/PostgresSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/SnowflakeSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/RedshiftSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/BigQuerySource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/DatabricksSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AthenaSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AuroraMySqlSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AuroraPostgresSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/ClickhouseSource"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/MySqlSource"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Add source",
+          "description": "Add a new source.",
+          "tags": ["Sources"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "source": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/PostgresSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SnowflakeSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RedshiftSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BigQuerySourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DatabricksSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AthenaSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraMySqlSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraPostgresSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ClickhouseSourcePost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MySqlSourcePost"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "postgres": "#/components/schemas/PostgresSourcePost",
+                          "snowflake": "#/components/schemas/SnowflakeSourcePost",
+                          "redshift": "#/components/schemas/RedshiftSourcePost",
+                          "bigquery": "#/components/schemas/BigQuerySourcePost",
+                          "databricks": "#/components/schemas/DatabricksSourcePost",
+                          "athena": "#/components/schemas/AthenaSourcePost",
+                          "aurora_mysql": "#/components/schemas/AuroraMySqlSourcePost",
+                          "aurora_postgres": "#/components/schemas/AuroraPostgresSourcePost",
+                          "clickhouse": "#/components/schemas/ClickhouseSourcePost",
+                          "mysql": "#/components/schemas/MySqlSourcePost"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created"
+            }
+          }
+        }
+      },
+      "/sources/{source_id}": {
+        "delete": {
+          "summary": "Delete source",
+          "description": "Delete an existing source.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/SourceId"
+            }
+          ],
+          "tags": ["Sources"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update source",
+          "description": "Update an existing source.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/SourceId"
+            }
+          ],
+          "tags": ["Sources"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "source": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/PostgresSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SnowflakeSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RedshiftSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BigQuerySource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DatabricksSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AthenaSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraMySqlSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraPostgresSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ClickhouseSource"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MySqlSource"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "postgres": "#/components/schemas/PostgresSource",
+                          "snowflake": "#/components/schemas/SnowflakeSource",
+                          "redshift": "#/components/schemas/RedshiftSource",
+                          "bigquery": "#/components/schemas/BigQuerySource",
+                          "databricks": "#/components/schemas/DatabricksSource",
+                          "athena": "#/components/schemas/AthenaSource",
+                          "aurora_mysql": "#/components/schemas/AuroraMySqlSource",
+                          "aurora_postgres": "#/components/schemas/AuroraPostgresSource",
+                          "clickhouse": "#/components/schemas/ClickhouseSource",
+                          "mysql": "#/components/schemas/MySqlSource"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/sources/{source_id}/test-connection": {
+        "post": {
+          "summary": "Test source connection",
+          "description": "Test connection to source.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/SourceId"
+            }
+          ],
+          "tags": ["Sources"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/destinations": {
+        "get": {
+          "summary": "Get destinations",
+          "description": "The Destination endpoint returns the configured data destinations. Desinations are the databases and data warehouses within the consumer environments.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/DestinationIdInProviderSystem"
+            }
+          ],
+          "tags": ["Destinations"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "destinations": {
+                            "type": "array",
+                            "items": {
+                              "oneOf": [
+                                {
+                                  "$ref": "#/components/schemas/PostgresDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/MySqlDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/SnowflakeDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/RedshiftDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/BigQueryDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/DatabricksDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/S3Destination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/S3CompatibleDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/GcsDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AthenaDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AuroraMySqlDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AuroraPostgresDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/ClickhouseDestination"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/GoogleSheetsDestination"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Add destination",
+          "description": "Add a new destination.",
+          "tags": ["Destinations"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "destination": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/PostgresDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MySqlDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SnowflakeDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RedshiftDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BigQueryDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DatabricksDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3DestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AzureBlobStorageDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3CompatibleDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GcsDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AthenaDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraMySqlDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraPostgresDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ClickhouseDestinationPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GoogleSheetsDestinationPost"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "postgres": "#/components/schemas/PostgresDestinationPost",
+                          "mysql": "#/components/schemas/MySqlDestinationPost",
+                          "snowflake": "#/components/schemas/SnowflakeDestinationPost",
+                          "redshift": "#/components/schemas/RedshiftDestinationPost",
+                          "bigquery": "#/components/schemas/BigQueryDestinationPost",
+                          "databricks": "#/components/schemas/DatabricksDestinationPost",
+                          "s3": "#/components/schemas/S3DestinationPost",
+                          "abs": "#/components/schemas/AbsDestinationPost",
+                          "s3_compatible": "#/components/schemas/S3CompatibleDestinationPost",
+                          "gcs": "#/components/schemas/GcsDestinationPost",
+                          "athena": "#/components/schemas/AthenaDestinationPost",
+                          "aurora_mysql": "#/components/schemas/AuroraMySqlDestinationPost",
+                          "aurora_postgres": "#/components/schemas/AuroraPostgresDestinationPost",
+                          "clickhouse": "#/components/schemas/ClickhouseDestinationPost",
+                          "google_sheets": "#/components/schemas/GoogleSheetsDestinationPost"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created"
+            }
+          }
+        }
+      },
+      "/destinations/{destination_id}": {
+        "delete": {
+          "summary": "Delete destination",
+          "description": "Delete an existing destination.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/DestinationId"
+            }
+          ],
+          "tags": ["Destinations"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update destination",
+          "description": "Update an existing destination.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/DestinationId"
+            }
+          ],
+          "tags": ["Destinations"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "destination": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/PostgresDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MySqlDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SnowflakeDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RedshiftDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BigQueryDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DatabricksDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3DestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3CompatibleDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AzureBlobStorageDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GcsDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AthenaDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraMySqlDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraPostgresDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ClickhouseDestinationPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GoogleSheetsDestinationPatch"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "postgres": "#/components/schemas/PostgresDestinationPatch",
+                          "mysql": "#/components/schemas/MySqlDestinationPatch",
+                          "snowflake": "#/components/schemas/SnowflakeDestinationPatch",
+                          "redshift": "#/components/schemas/RedshiftDestinationPatch",
+                          "bigquery": "#/components/schemas/BigQueryDestinationPatch",
+                          "databricks": "#/components/schemas/DatabricksDestinationPatch",
+                          "s3": "#/components/schemas/S3DestinationPatch",
+                          "s3_compatible": "#/components/schemas/S3CompatibleDestinationPatch",
+                          "abs": "#/components/schemas/AzureBlobStorageDestinationPatch",
+                          "gcs": "#/components/schemas/GcsDestinationPatch",
+                          "athena": "#/components/schemas/AthenaDestinationPatch",
+                          "aurora_mysql": "#/components/schemas/AuroraMySqlDestinationPatch",
+                          "aurora_postgres": "#/components/schemas/AuroraPostgresDestinationPatch",
+                          "clickhouse": "#/components/schemas/ClickhouseDestinationPatch",
+                          "google_sheets": "#/components/schemas/GoogleSheetsDestinationPatch"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/public/vendors/destinations": {
+        "get": {
+          "summary": "Get destination vendors & fields",
+          "security": [],
+          "description": "Get a list of vendors with their required fields. This can be used to dynamically render a destination connection form per vendor for a native integration.",
+          "tags": ["Destinations"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "number"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "destinations": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/VendorField"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/destinations/{destination_id}/test-connection": {
+        "post": {
+          "summary": "Test destination connection",
+          "description": "Test connection to destination.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/DestinationId"
+            }
+          ],
+          "tags": ["Destinations"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/recipients": {
+        "get": {
+          "summary": "Get recipients",
+          "description": "The Recipient endpoint returns the configured data recipients. Recipients are the customers who will consume data.",
+          "tags": ["Recipients"],
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientIdInProviderSystem"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "recipients": {
+                            "type": "array",
+                            "items": {
+                              "oneOf": [
+                                {
+                                  "$ref": "#/components/schemas/TableTenantedRecipient"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Add recipient",
+          "description": "Add a new recipient.",
+          "tags": ["Recipients"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "recipient": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TableTenantedRecipientPost"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created"
+            }
+          }
+        }
+      },
+      "/recipients/{recipient_id}": {
+        "delete": {
+          "summary": "Delete recipient",
+          "description": "Delete an existing recipient.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientId"
+            }
+          ],
+          "tags": ["Recipients"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update recipient",
+          "description": "Update an existing recipient.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientId"
+            }
+          ],
+          "tags": ["Recipients"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "recipient": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TableTenantedRecipientPatch"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/recipient-source-credentials": {
+        "get": {
+          "summary": "Get recipient-source-credentials",
+          "description": "The Recipient Source Credentials endpoint returns the configured recipient-source-credentials data. Recipient Source Credentials are objects that represent specific credentials to be used when accessing a source on behalf of a recipient.",
+          "tags": ["Recipient Source Credentials"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "recipient_source_credentials": {
+                            "type": "array",
+                            "items": {
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/RecipientSourceCredential"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Add recipient_source_credential",
+          "description": "Add a new recipient_source_credential.",
+          "tags": ["Recipient Source Credentials"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "recipient_source_credential": {
+                      "type": "object",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/RecipientSourceCredentialPost"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created"
+            }
+          }
+        }
+      },
+      "/recipient-source-credentials/{recipient_source_credential_id}": {
+        "delete": {
+          "summary": "Delete recipient_source_credential",
+          "description": "Delete an existing recipient_source_credential.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientSourceCredentialId"
+            }
+          ],
+          "tags": ["Recipient Source Credentials"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update recipient_source_credential",
+          "description": "Update an existing recipient_source_credential.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientSourceCredentialId"
+            }
+          ],
+          "tags": ["Recipient Source Credentials"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "recipient_source_credential": {
+                      "type": "object",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/RecipientSourceCredentialPatch"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/recipient-source-credentials/{recipient_source_credential_id}/test-connection": {
+        "post": {
+          "summary": "Test recipient source credential connection",
+          "description": "Test recipient specific credentials for the source.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientSourceCredentialId"
+            }
+          ],
+          "tags": ["Recipient Source Credentials"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/webhooks": {
+        "get": {
+          "summary": "Get Webhooks",
+          "description": "The Webhook endpoint returns the configured data webhooks. A webhook is an HTTP-based callback function.",
+          "tags": ["Webhooks"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "webhooks": {
+                            "type": "array",
+                            "items": {
+                              "oneOf": [
+                                {
+                                  "$ref": "#/components/schemas/GenericWebhook"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/PagerDutyWebhook"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/SlackWebhook"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Add new webhook",
+          "description": "Add a new webhook destination to monitor transfer failures. All errors resulting from transfers that do not succeed will be delivered to this webhook endpoint for monitoring or logging.",
+          "tags": ["Webhooks"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "webhook": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/GenericWebhookPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SlackWebhookPost"
+                        },
+                        {
+                          "$ref": "#/components/schemas/PagerDutyWebhookPost"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "generic_post": "#/components/schemas/GenericWebhookPost",
+                          "generic_get": "#/components/schemas/GenericWebhookPost",
+                          "pagerduty": "#/components/schemas/PagerDutyWebhookPost",
+                          "slack": "#/components/schemas/SlackWebhookPost"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/webhooks/{webhook_id}": {
+        "delete": {
+          "summary": "Delete webhook",
+          "description": "Delete an existing webhook.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/WebhookId"
+            }
+          ],
+          "tags": ["Webhooks"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update webhook",
+          "description": "Update an existing webhook.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/WebhookId"
+            }
+          ],
+          "tags": ["Webhooks"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "webhook": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/GenericWebhookPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SlackWebhookPatch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/PagerDutyWebhookPatch"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "generic_post": "#/components/schemas/GenericWebhookPatch",
+                          "generic_get": "#/components/schemas/GenericWebhookPatch",
+                          "pagerduty": "#/components/schemas/PagerDutyWebhookPatch",
+                          "slack": "#/components/schemas/SlackWebhookPatch"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/actions/generate-service-account": {
+        "post": {
+          "summary": "Generate Service Account",
+          "deprecated": true,
+          "description": "Generate a Service Account to authenticate into Google Cloud destinations (Google Sheets)",
+          "tags": ["Auth"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "number"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "service_account_name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/actions/generate-ssh-key": {
+        "post": {
+          "summary": "Generate SSH Key",
+          "description": "Generate an SSH public key to authenticate into a bastion host when SSH tunneling is enabled.",
+          "tags": ["Auth"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "number"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "public_key": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/actions/generate-scoped-auth-token": {
+        "post": {
+          "summary": "Generate Scoped Auth Token",
+          "description": "Generate an Auth token with limited permissions.",
+          "tags": ["Auth"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "application_origin": {
+                      "type": "string"
+                    },
+                    "destination": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/PostgresDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MySqlDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SnowflakeDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RedshiftDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BigQueryDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DatabricksDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AzureBlobStorageDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3Destination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3CompatibleDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GcsDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AthenaDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraMySqlDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraPostgresDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ClickhouseDestination"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GoogleSheetsDestination"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "postgres": "#/components/schemas/PostgresDestination",
+                          "mysql": "#/components/schemas/MySqlDestination",
+                          "snowflake": "#/components/schemas/SnowflakeDestination",
+                          "redshift": "#/components/schemas/RedshiftDestination",
+                          "bigquery": "#/components/schemas/BigQueryDestination",
+                          "databricks": "#/components/schemas/DatabricksDestination",
+                          "s3": "#/components/schemas/S3Destination",
+                          "abs": "#/components/schemas/AzureBlobStorageDestination",
+                          "s3_compatible": "#/components/schemas/S3CompatibleDestination",
+                          "gcs": "#/components/schemas/GcsDestination",
+                          "athena": "#/components/schemas/AthenaDestination",
+                          "aurora_mysql": "#/components/schemas/AuroraMySqlDestination",
+                          "aurora_postgres": "#/components/schemas/AuroraPostgresDestination",
+                          "clickhouse": "#/components/schemas/ClickhouseDestination",
+                          "google_sheets": "#/components/schemas/GoogleSheetsDestination"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "number"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "scoped_token": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/destinations/{destination_id}/transfer": {
+        "post": {
+          "summary": "Begin transfer",
+          "description": "Enqueue a transfer to specified destination.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/DestinationId"
+            }
+          ],
+          "tags": ["Transfers"],
+          "requestBody": {
+            "required": false,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "models": {
+                      "description": "Specifies models to run. If unspecified or left empty, all models will be run.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "full_refresh": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "start_transfer_window_at": {
+                      "description": "All rows transfered will have a last_updated_at value greater than or equal to this value. If ommitted, the Unix epoch will be used. Timestamps should be represented in RFC3339 format.",
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-01-21T17:32:28Z",
+                      "default": null
+                    },
+                    "end_transfer_window_at": {
+                      "description": "All rows transfered will have a last_updated_at value less than this value. If ommitted, the current timestamp will be used. Timestamps should be represented in RFC3339 format.",
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-01-21T19:31:55Z",
+                      "default": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/transfers": {
+        "get": {
+          "summary": "Get transfers",
+          "description": "Retrieve list of transfers.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/TransferCount"
+            },
+            {
+              "$ref": "#/components/parameters/DestinationIdQueryFilter"
+            },
+            {
+              "$ref": "#/components/parameters/TransferStatusQueryFilter"
+            }
+          ],
+          "tags": ["Transfers"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "transfers": {
+                            "type": "array",
+                            "items": {
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/Transfer"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/transfers/{transfer_id}": {
+        "get": {
+          "summary": "Get transfer",
+          "description": "Retrieve details about a specific transfer.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/TransferId"
+            }
+          ],
+          "tags": ["Transfers"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "transfers": {
+                            "type": "array",
+                            "items": {
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/Transfer"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/reports/transfers": {
+        "get": {
+          "summary": "Get transfer reports",
+          "description": "Retrieve transfer stats. Will return the summary stats of all destinations over the most recent 2 weeks by default.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/DestinationIds"
+            },
+            {
+              "$ref": "#/components/parameters/StartDate"
+            },
+            {
+              "$ref": "#/components/parameters/EndDate"
+            }
+          ],
+          "tags": ["Reports"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/actions/enable-all": {
+        "post": {
+          "summary": "Set all destinations to \"enabled\" state",
+          "description": "Enable all destinations to be updated during future scheduled transfers. (Will not affect manual transfers initatied via the /transfer endpoint.)",
+          "tags": ["Actions"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/actions/pause-all": {
+        "post": {
+          "summary": "Set all destinations to \"paused\" state",
+          "description": "Pause all destinations so that they will not be updated during future scheduled transfers. (Will not affect manual transfers initatied via the /transfer endpoint.)",
+          "tags": ["Actions"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/magic-links": {
+        "get": {
+          "summary": "Get magic links",
+          "description": "Retrieve list of magic links.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/RecipientIdInProviderSystem"
+            }
+          ],
+          "tags": ["Magic Links"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "webhooks": {
+                            "type": "array",
+                            "items": {
+                              "oneOf": [
+                                {
+                                  "$ref": "#/components/schemas/PostgresMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/MySqlMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/SnowflakeMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/RedshiftMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/BigQueryMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/DatabricksMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/S3MagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/S3CompatibleMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AzureBlobStorageMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/GcsMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AthenaMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AuroraMySqlMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/AuroraPostgresMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/ClickhouseMagicLink"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/GoogleSheetsMagicLink"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create new magic link",
+          "description": "Generates an ephemeral magic link that the data recipient can use to easily add a new destination. The link will navigate the user to the Prequel Connect feature. For security reasons, the host must be provided when the link is generated and the link expires after 7 days.",
+          "tags": ["Magic Links"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["properties"],
+                  "properties": {
+                    "magic_link": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/PostgresMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/MySqlMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SnowflakeMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RedshiftMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/BigQueryMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DatabricksMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3MagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/S3CompatibleMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AzureBlobStorageMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GcsMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AthenaMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraMySqlMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AuroraPostgresMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/ClickhouseMagicLink"
+                        },
+                        {
+                          "$ref": "#/components/schemas/GoogleSheetsMagicLink"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "vendor",
+                        "mapping": {
+                          "postgres": "#/components/schemas/PostgresMagicLink",
+                          "mysql": "#/components/schemas/MySqlMagicLink",
+                          "snowflake": "#/components/schemas/SnowflakeMagicLink",
+                          "redshift": "#/components/schemas/RedshiftMagicLink",
+                          "bigquery": "#/components/schemas/BigQueryMagicLink",
+                          "databricks": "#/components/schemas/DatabricksMagicLink",
+                          "s3": "#/components/schemas/S3MagicLink",
+                          "s3_compatible": "#/components/schemas/S3CompatibleMagicLink",
+                          "abs": "#/components/schemas/AzureBlobStorageMagicLink",
+                          "gcs": "#/components/schemas/GcsMagicLink",
+                          "athena": "#/components/schemas/AthenaMagicLink",
+                          "aurora_mysql": "#/components/schemas/AuroraMySqlMagicLink",
+                          "aurora_postgres": "#/components/schemas/AuroraPostgresMagicLink",
+                          "clickhouse": "#/components/schemas/ClickhouseMagicLink",
+                          "google_sheets": "#/components/schemas/GoogleSheetsMagicLink"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/magic-links/{magic_link_id}": {
+        "delete": {
+          "summary": "Delete magic link",
+          "description": "Delete existing magic link.",
+          "tags": ["Magic Links"],
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/MagicLinkId"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/logs": {
+        "get": {
+          "summary": "Get event logs",
+          "description": "Returns the recent events performed on the given organization.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/LogCount"
+            },
+            {
+              "$ref": "#/components/parameters/LogOffset"
+            },
+            {
+              "$ref": "#/components/parameters/LogMinTime"
+            },
+            {
+              "$ref": "#/components/parameters/LogType"
+            }
+          ],
+          "tags": ["Monitoring & Logging"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/LogEvent"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/export/models": {
+        "post": {
+          "summary": "Add model",
+          "description": "Add a new model.",
+          "tags": ["Models"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["model"],
+                  "properties": {
+                    "model": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Model"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created"
+            }
+          }
+        },
+        "get": {
+          "summary": "Get models",
+          "description": "The models endpoint returns the configured data models. A model is a table or view in the source database that will be replicated to the destination.",
+          "tags": ["Models"],
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ModelName"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "models": {
+                            "type": "array",
+                            "items": {
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/Model"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/export/models/{model_id}": {
+        "get": {
+          "summary": "Get model",
+          "description": "Retrieve details about a specific model.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ModelId"
+            }
+          ],
+          "tags": ["Models"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "model": {
+                        "type": "object",
+                        "$ref": "#/components/schemas/Model"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update model",
+          "description": "Update an existing model.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ModelId"
+            }
+          ],
+          "tags": ["Models"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["model"],
+                  "properties": {
+                    "model": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Model"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete model",
+          "description": "Delete an existing model.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ModelId"
+            }
+          ],
+          "tags": ["Models"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/export/models/{model_id}/validate": {
+        "post": {
+          "summary": "Validate model",
+          "description": "Validate a given model and ensure that the tables and columns referenced exist within the source.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ModelId"
+            }
+          ],
+          "tags": ["Models"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/export/products": {
+        "post": {
+          "summary": "Add product",
+          "description": "Add a new product.",
+          "tags": ["Products"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["product"],
+                  "properties": {
+                    "product": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created"
+            }
+          }
+        },
+        "get": {
+          "summary": "Get products",
+          "description": "The products endpoint returns the configured data products. A product is a collection of models that can be assigned to specify which models should be made available.",
+          "tags": ["Products"],
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ProductName"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "products": {
+                            "type": "array",
+                            "items": {
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/Product"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/export/products/{product_id}": {
+        "get": {
+          "summary": "Get product",
+          "description": "Retrieve details about a specific product.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ProductId"
+            }
+          ],
+          "tags": ["Products"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "product": {
+                        "type": "object",
+                        "$ref": "#/components/schemas/Product"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update product",
+          "description": "Update an existing product.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ProductId"
+            }
+          ],
+          "tags": ["Products"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["product"],
+                  "properties": {
+                    "product": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete product",
+          "description": "Delete an existing product.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ProductId"
+            }
+          ],
+          "tags": ["Products"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/export/products/{product_id}/validate": {
+        "post": {
+          "summary": "Validate product",
+          "description": "Validate a given product.",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/ProductId"
+            }
+          ],
+          "tags": ["Products"],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "BaseSource": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true
+            },
+            "name": {
+              "type": "string",
+              "description": "Descriptive name of database. (Used only for reference or comment)"
+            },
+            "vendor": {
+              "type": "string",
+              "enum": [
+                "athena",
+                "aurora_postgres",
+                "aurora_mysql",
+                "clickhouse",
+                "postgres",
+                "snowflake",
+                "redshift",
+                "bigquery",
+                "databricks",
+                "mysql",
+                "sql_server",
+                "singlestore"
+              ],
+              "description": "Type of database."
+            }
+          }
+        },
+        "BaseDestination": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true
+            },
+            "id_in_provider_system": {
+              "type": "string",
+              "description": "Identifier used to filter data as configured in the Prequel config. This ID must map to the ID used in the source database that indicates row-level data ownership. It will be used at query time as the organization_id filter. Required if recipient_id is not provided."
+            },
+            "recipient_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "ID of Recipient created for this destination. Required if id_in_provider_system is not provided."
+            },
+            "name": {
+              "type": "string",
+              "description": "Descriptive name of database. (Used only for reference or comment)"
+            },
+            "vendor": {
+              "type": "string",
+              "enum": [
+                "athena",
+                "aurora_postgres",
+                "aurora_mysql",
+                "clickhouse",
+                "postgres",
+                "snowflake",
+                "redshift",
+                "bigquery",
+                "databricks",
+                "s3",
+                "s3_compatible",
+                "gcs",
+                "abs",
+                "google_sheets",
+                "sql_server",
+                "mysql",
+                "singlestore"
+              ],
+              "description": "Type of database (e.g., postgres, mysql, snowflake, redshift, bigquery, databricks, or s3)."
+            },
+            "schema": {
+              "type": "string",
+              "description": "Schema in which to write transferred data. References a folder name for object storage destinations. Refers to a database for destinations without schemas"
+            },
+            "frequency_minutes": {
+              "type": "integer",
+              "description": "Number of minutes between transfers. Between 15 and 1440 (24 hours). If not provided, an organization level default will be used."
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Specifies products (and associated models) that the destination can receive. If products are not configured, this can be left blank, and all models will be available to enable."
+              }
+            },
+            "enabled_models": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Specifies models that the destination will recieve. Use \"*\" to enable all models."
+              },
+              "default": ["*"]
+            },
+            "last_completed_transfer": {
+              "$ref": "#/components/schemas/Transfer",
+              "readOnly": true
+            }
+          }
+        },
+        "PatchOptions": {
+          "type": "object",
+          "properties": {
+            "is_enabled": {
+              "type": "boolean",
+              "description": "Whether this destination is enabled (vs. paused).",
+              "default": true
+            }
+          }
+        },
+        "BaseMagicLink": {
+          "type": "object",
+          "required": ["name", "vendor"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Descriptive name of destination (e.g., an organization name). (Used only for reference or comment)"
+            },
+            "id_in_provider_system": {
+              "type": "string",
+              "description": "Identifier used to filter data as configured in the Prequel config. This ID must map to the ID used in the source database that indicates row-level data ownership. It will be used at query time as the organization_id filter. Required if recipient_id is not provided."
+            },
+            "recipient_id": {
+              "type": "string",
+              "description": "ID of Recipient created for this destination. Required if id_in_provider_system is not provided."
+            },
+            "vendor": {
+              "type": "string",
+              "enum": [
+                "athena",
+                "aurora_postgres",
+                "aurora_mysql",
+                "clickhouse",
+                "postgres",
+                "snowflake",
+                "redshift",
+                "bigquery",
+                "databricks",
+                "s3",
+                "gcs",
+                "google_sheets"
+              ],
+              "description": "The type of destination this Magic Link can be used to add."
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Specifies products (and associated models) that the destination can receive. If products are not configured, this can be left blank, and all models will be available to enable."
+              }
+            },
+            "set_destination_enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "If false, the destination resulting from this magic link will be created in disabled state and will have to be manually enabled before data starts syncing."
+            },
+            "redirect_url": {
+              "type": "string",
+              "description": "The URL to which the user will be redirected after successful magic link submission. If left blank, the user will remain on the successful submission page."
+            }
+          }
+        },
+        "Model": {
+          "type": "object",
+          "required": ["model_name", "columns"],
+          "properties": {
+            "model_name": {
+              "type": "string",
+              "description": "The name of the model. This is customer facing and will be used as the table name in the destination."
+            },
+            "description": {
+              "type": "string",
+              "description": "A brief description of the table. This is customer facing and will be used as the table comment in the destination."
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ModelColumn"
+              }
+            },
+            "source_table": {
+              "type": "string",
+              "description": "The source table in the database."
+            },
+            "organization_column": {
+              "type": "string",
+              "description": "The column that links to the organization."
+            }
+          }
+        },
+        "ModelColumn": {
+          "type": "object",
+          "properties": {
+            "name_in_source": {
+              "type": "string",
+              "description": "The column name in the source."
+            },
+            "name_in_destination": {
+              "type": "string",
+              "description": "The column name in the destination."
+            },
+            "data_type": {
+              "type": "string",
+              "description": "The data type of the column."
+            },
+            "is_primary_key": {
+              "type": "boolean",
+              "default": false,
+              "description": "Indicates if the column is a primary key."
+            },
+            "is_last_modified": {
+              "type": "boolean",
+              "default": false,
+              "description": "Indicates if the column represents the last modified date/time."
+            }
+          }
+        },
+        "Product": {
+          "type": "object",
+          "required": ["product_name", "models"],
+          "properties": {
+            "product_name": {
+              "type": "string",
+              "description": "The name of the product. This is not customer facing."
+            },
+            "description": {
+              "type": "string",
+              "description": "A brief description of the product. This is not customer facing."
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "The models that are assigned to this product. Models can be assigned to multiple products."
+              }
+            }
+          }
+        },
+        "BaseAthena": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "description": "A preconfigured Athena Workgroup. Must be configured for Athena engine version 3. If left blank, the default Workgroup is used."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of Athena database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to Athena database. Should be the same as the bucket Secret Key.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "AthenaSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseAthena"
+            },
+            {
+              "$ref": "#/components/schemas/S3Options"
+            }
+          ]
+        },
+        "AthenaSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AthenaSource"
+            }
+          ],
+          "required": [
+            "vendor",
+            "name",
+            "database",
+            "password",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region"
+          ]
+        },
+        "AthenaDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseAthena"
+            },
+            {
+              "$ref": "#/components/schemas/S3Options"
+            }
+          ]
+        },
+        "AthenaDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AthenaDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "database",
+            "password",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region",
+            "enabled_models"
+          ]
+        },
+        "AthenaDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AthenaDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "AthenaMagicLink": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of bucket where the data should be staged."
+                }
+              }
+            }
+          ],
+          "required": ["bucket_name"]
+        },
+        "BasePostgres": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "Port used by database engine. By default, 5432 for Postgres."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of database."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "PostgresSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BasePostgres"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "PostgresSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PostgresSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password"
+          ]
+        },
+        "PostgresDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BasePostgres"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "PostgresDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PostgresDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "enabled_models"
+          ]
+        },
+        "PostgresDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PostgresDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "PostgresMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                }
+              }
+            }
+          ],
+          "required": ["host"]
+        },
+        "BaseAuroraPostgres": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "Port used by database engine. By default, 5432 for Postgres."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of database."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "AuroraPostgresSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseAuroraPostgres"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "AuroraPostgresSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AuroraPostgresSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password"
+          ]
+        },
+        "AuroraPostgresDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseAuroraPostgres"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "AuroraPostgresDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AuroraPostgresDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "enabled_models"
+          ]
+        },
+        "AuroraPostgresDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AuroraPostgresDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "AuroraPostgresMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                }
+              }
+            }
+          ],
+          "required": ["host"]
+        },
+        "BaseMySql": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "Port used by database engine. By default, 3306 for MySQL."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "MySqlSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseMySql"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "MySqlSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/MySqlSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password"
+          ]
+        },
+        "MySqlDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseMySql"
+            }
+          ]
+        },
+        "MySqlDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/MySqlDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "username",
+            "password",
+            "enabled_models"
+          ]
+        },
+        "MySqlDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/MySqlDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "MySqlMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                }
+              }
+            }
+          ],
+          "required": ["host"]
+        },
+        "BaseAuroraMySql": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "Port used by database engine. By default, 3306 for MySQL."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "AuroraMySqlSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseAuroraMySql"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "AuroraMySqlSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AuroraMySqlSource"
+            }
+          ],
+          "required": ["name", "vendor", "host", "port", "username", "password"]
+        },
+        "AuroraMySqlDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseAuroraMySql"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "AuroraMySqlDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AuroraMySqlDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "username",
+            "password",
+            "enabled_models"
+          ]
+        },
+        "AuroraMySqlDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AuroraMySqlDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "AuroraMySqlMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                }
+              }
+            }
+          ],
+          "required": ["host"]
+        },
+        "BaseSnowflake": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "default": 443,
+                  "description": "Port used by database engine. By default, 443 for Snowflake."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of database."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "SnowflakeSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseSnowflake"
+            }
+          ]
+        },
+        "SnowflakeSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SnowflakeSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password"
+          ]
+        },
+        "SnowflakeDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseSnowflake"
+            }
+          ]
+        },
+        "SnowflakeDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SnowflakeDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "enabled_models"
+          ]
+        },
+        "SnowflakeDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SnowflakeDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "SnowflakeMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of data warehouse."
+                }
+              }
+            }
+          ],
+          "required": ["host"]
+        },
+        "BaseClickhouse": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "Port used by database engine. By default, 9440 for ClickHouse."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of database."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                },
+                "cluster": {
+                  "type": "string",
+                  "description": "Cluster to use for Clickhouse's ON CLUSTER statements (optional)."
+                }
+              }
+            }
+          ]
+        },
+        "ClickhouseSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseClickhouse"
+            },
+            {
+              "$ref": "#/components/schemas/ObjectStorageOptions"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "ClickhouseSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ClickhouseSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "username",
+            "password",
+            "database",
+            "bucket_name",
+            "bucket_vendor",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region"
+          ]
+        },
+        "ClickhouseDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseClickhouse"
+            },
+            {
+              "$ref": "#/components/schemas/ObjectStorageOptions"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "ClickhouseDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ClickhouseDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "bucket_name",
+            "bucket_vendor",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region",
+            "enabled_models"
+          ]
+        },
+        "ClickhouseDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ClickhouseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "ClickhouseMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host name of database."
+                },
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of bucket where the data should be staged."
+                }
+              }
+            }
+          ],
+          "required": ["host", "bucket_name", "bucket_vendor", "bucket_access_id"]
+        },
+        "GoogleSheetsDestination": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Descriptive name of database. (Used only for reference or comment)"
+                },
+                "host": {
+                  "type": "string",
+                  "description": "URL of the Google Sheet. Must be of the form docs.google.com/spreadsheets/... (http protocol optional)."
+                },
+                "id_in_provider_system": {
+                  "type": "string",
+                  "description": "Identifier used to filter data as configured in the Prequel config. This ID must map to the ID used in the source database that indicates row-level data ownership. It will be used at query time as the organization_id filter."
+                },
+                "recipient_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID of Recipient created for this destination. Required if id_in_provider_system is not provided."
+                }
+              }
+            }
+          ]
+        },
+        "GoogleSheetsDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/GoogleSheetsDestination"
+            }
+          ],
+          "required": ["name", "host", "enabled_models"]
+        },
+        "GoogleSheetsDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/GoogleSheetsDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "GoogleSheetsMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "URL of the Google Sheet. Must be of the form docs.google.com/spreadsheets/... (http protocol optional)."
+                }
+              }
+            }
+          ],
+          "required": ["host"]
+        },
+        "BaseRedshift": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host address of database."
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "Port used by database engine. By default, 5439 for Redshift."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of database."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "RedshiftSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseRedshift"
+            },
+            {
+              "$ref": "#/components/schemas/S3Options"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "RedshiftSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/RedshiftSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region"
+          ]
+        },
+        "RedshiftDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseRedshift"
+            },
+            {
+              "$ref": "#/components/schemas/S3Options"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "RedshiftDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/RedshiftDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region",
+            "enabled_models"
+          ]
+        },
+        "RedshiftDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/RedshiftDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "RedshiftMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Host name of data warehouse."
+                },
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of bucket where the data should be staged."
+                }
+              }
+            }
+          ],
+          "required": ["host", "bucket_name"]
+        },
+        "BaseBigQuery": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Project ID of the BigQuery project."
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username to use to connect to database. This must match the \"client_email\" field in the Service Account Key."
+                },
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of staging bucket."
+                },
+                "bucket_region": {
+                  "type": "string",
+                  "description": "Region where the staging bucket was created."
+                },
+                "service_account_key": {
+                  "type": "object",
+                  "description": "Service Account Key to use to connect to database. The entire Service Account Key should be provided as a single JSON object with all 11 fields (i.e., the full key generated by GCP, without modification).",
+                  "writeOnly": true,
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "project_id": {
+                      "type": "string"
+                    },
+                    "private_key_id": {
+                      "type": "string"
+                    },
+                    "private_key": {
+                      "type": "string"
+                    },
+                    "client_email": {
+                      "type": "string"
+                    },
+                    "client_id": {
+                      "type": "string"
+                    },
+                    "auth_uri": {
+                      "type": "string"
+                    },
+                    "token_uri": {
+                      "type": "string"
+                    },
+                    "auth_provider_x509_cert_url": {
+                      "type": "string"
+                    },
+                    "client_x509_cert_url": {
+                      "type": "string"
+                    },
+                    "universe_domain": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "BigQuerySource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseBigQuery"
+            }
+          ]
+        },
+        "BigQuerySourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BigQuerySource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "username",
+            "service_account_key",
+            "bucket_name",
+            "bucket_region"
+          ]
+        },
+        "BigQueryDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseBigQuery"
+            }
+          ]
+        },
+        "BigQueryDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BigQueryDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "bucket_name",
+            "bucket_region",
+            "username",
+            "service_account_key",
+            "enabled_models"
+          ]
+        },
+        "BigQueryDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BigQueryDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "BigQueryMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Project ID of the BigQuery project."
+                },
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of bucket where the data should be staged."
+                }
+              }
+            }
+          ],
+          "required": ["host", "bucket_name"]
+        },
+        "BaseDatabricks": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Server hostname of the SQL endpoint.",
+                  "example": "adb-1099123456789876.12.azuredatabricks.net"
+                },
+                "port": {
+                  "type": "integer",
+                  "description": "By default, 443 for Databricks."
+                },
+                "database": {
+                  "type": "string",
+                  "description": "Name of catalog to write data to.",
+                  "example": "hive_metastore"
+                },
+                "username": {
+                  "type": "string",
+                  "description": "HTTP path of the SQL endpoint.",
+                  "example": "/sql/1.0/endpoints/a98765ab4c3210a0"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Personal access token to use to connect to database.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "DatabricksSource": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseSource"
+            },
+            {
+              "$ref": "#/components/schemas/BaseDatabricks"
+            },
+            {
+              "$ref": "#/components/schemas/ObjectStorageOptions"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "DatabricksSourcePost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/DatabricksSource"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "bucket_vendor",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "bucket_region"
+          ]
+        },
+        "DatabricksDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseDatabricks"
+            },
+            {
+              "$ref": "#/components/schemas/ObjectStorageOptions"
+            },
+            {
+              "$ref": "#/components/schemas/SshOptions"
+            }
+          ]
+        },
+        "DatabricksDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/DatabricksDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "port",
+            "database",
+            "username",
+            "password",
+            "bucket_vendor",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "enabled_models"
+          ]
+        },
+        "DatabricksDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/DatabricksDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "DatabricksMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "Server hostname of database."
+                },
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of bucket where the data should be staged."
+                }
+              }
+            }
+          ],
+          "required": ["host", "bucket_name", "bucket_vendor", "bucket_access_id"]
+        },
+        "BaseS3": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "AWS bucket address. E.g., s3.us-east-1.amazonaws.com."
+                }
+              }
+            }
+          ]
+        },
+        "S3Destination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseS3"
+            },
+            {
+              "$ref": "#/components/schemas/S3Options"
+            }
+          ]
+        },
+        "S3DestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/S3Destination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "bucket_name",
+            "bucket_region",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "enabled_models"
+          ]
+        },
+        "S3DestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/S3Destination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "S3MagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of destination bucket."
+                }
+              }
+            }
+          ],
+          "required": ["bucket_name"]
+        },
+        "S3CompatibleDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/BaseS3"
+            },
+            {
+              "$ref": "#/components/schemas/S3Options"
+            }
+          ]
+        },
+        "S3CompatibleDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/S3CompatibleDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "host",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "enabled_models"
+          ]
+        },
+        "S3CompatibleDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/S3CompatibleDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "S3CompatibleMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "AWS bucket address. E.g., s3.us-east-1.amazonaws.com."
+                },
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of destination bucket."
+                }
+              }
+            }
+          ],
+          "required": ["host", "bucket_name"]
+        },
+        "GcsDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/GcsOptions"
+            }
+          ]
+        },
+        "GcsDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/GcsDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "enabled_models"
+          ]
+        },
+        "GcsDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/GcsDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "GcsMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of destination bucket."
+                }
+              }
+            }
+          ],
+          "required": ["bucket_name"]
+        },
+        "AzureBlobStorageDestination": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseDestination"
+            },
+            {
+              "$ref": "#/components/schemas/AzureBlobStorageOptions"
+            }
+          ]
+        },
+        "AzureBlobStorageDestinationPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AzureBlobStorageDestination"
+            }
+          ],
+          "required": [
+            "name",
+            "vendor",
+            "schema",
+            "bucket_name",
+            "bucket_access_id",
+            "bucket_secret_key",
+            "enabled_models"
+          ]
+        },
+        "AzureBlobStorageMagicLink": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseMagicLink"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "bucket_name": {
+                  "type": "string",
+                  "description": "Name of destination bucket."
+                }
+              }
+            }
+          ],
+          "required": ["bucket_name", "bucket_access_id"]
+        },
+        "AzureBlobStorageDestinationPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/AzureBlobStorageDestination"
+            },
+            {
+              "$ref": "#/components/schemas/PatchOptions"
+            }
+          ]
+        },
+        "SshOptions": {
+          "type": "object",
+          "properties": {
+            "use_ssh_tunnel": {
+              "type": "boolean",
+              "description": "Whether this connection should use an SSH tunnel to connect. If TRUE, optional parameters beginning with \"ssh_tunnel\" must be provided."
+            },
+            "ssh_tunnel_host": {
+              "type": "string",
+              "description": "Host address of bastion server."
+            },
+            "ssh_tunnel_port": {
+              "type": "integer",
+              "description": "Port through which the Prequel service will attempt to SSH to bastion server. By default, 22 for SSH."
+            },
+            "ssh_tunnel_username": {
+              "type": "string",
+              "description": "Username to use to connect to bastion server."
+            }
+          }
+        },
+        "S3Options": {
+          "type": "object",
+          "properties": {
+            "bucket_name": {
+              "type": "string",
+              "description": "Name of bucket."
+            },
+            "bucket_access_id": {
+              "type": "string",
+              "description": "AWS IAM Access Key ID"
+            },
+            "bucket_secret_key": {
+              "type": "string",
+              "description": "AWS IAM Secret Access Key",
+              "writeOnly": true
+            },
+            "bucket_region": {
+              "type": "string",
+              "description": "Region of bucket."
+            }
+          }
+        },
+        "GcsOptions": {
+          "type": "object",
+          "properties": {
+            "bucket_name": {
+              "type": "string",
+              "description": "Name of bucket."
+            },
+            "bucket_access_id": {
+              "type": "string",
+              "description": "Access Key ID for the bucket"
+            },
+            "bucket_secret_key": {
+              "type": "string",
+              "description": "Secret Access Key for the bucket",
+              "writeOnly": true
+            }
+          }
+        },
+        "AzureBlobStorageOptions": {
+          "type": "object",
+          "properties": {
+            "bucket_name": {
+              "type": "string",
+              "description": "Name of bucket"
+            },
+            "bucket_access_id": {
+              "type": "string",
+              "description": "Storage account name"
+            },
+            "bucket_secret_key": {
+              "type": "string",
+              "description": "Storage account SAS token",
+              "writeOnly": true
+            }
+          }
+        },
+        "ObjectStorageOptions": {
+          "type": "object",
+          "properties": {
+            "bucket_vendor": {
+              "type": "string",
+              "description": "Provider of bucket. E.g., 's3', 'gcs' (Google Cloud Storage), or 'abs' (Azure Blob Storage)."
+            },
+            "bucket_name": {
+              "type": "string",
+              "description": "Name of bucket."
+            },
+            "bucket_access_id": {
+              "type": "string",
+              "description": "Access Key ID"
+            },
+            "bucket_secret_key": {
+              "type": "string",
+              "description": "Secret Access Key",
+              "writeOnly": true
+            },
+            "bucket_region": {
+              "type": "string",
+              "description": "Region of bucket."
+            }
+          }
+        },
+        "VendorField": {
+          "type": "object",
+          "properties": {
+            "vendor_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "uses_staging_bucket": {
+              "type": "boolean"
+            },
+            "uses_service_account": {
+              "type": "boolean"
+            },
+            "supports_ssh_tunnel": {
+              "type": "boolean"
+            },
+            "docs": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "is_required": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "placeholder": {
+                    "type": "string"
+                  },
+                  "help": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "logo_url": {
+              "type": "string"
+            }
+          }
+        },
+        "SchemaTenantedRecipient": {
+          "title": "Schema Tenanted Recipient",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true
+            },
+            "name": {
+              "type": "string"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Specifies products (and associated models) that the destination can receive. If products are not configured, this can be left blank, and all models will be available to enable."
+              }
+            }
+          }
+        },
+        "SchemaTenantedRecipientPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SchemaTenantedRecipient"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "Schema used in source system for recipient. This field cannot be modified once created."
+                }
+              }
+            }
+          ],
+          "required": ["id", "name", "schema"]
+        },
+        "SchemaTenantedRecipientPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SchemaTenantedRecipient"
+            }
+          ]
+        },
+        "TableTenantedRecipient": {
+          "title": "Table Tenanted Recipient",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true
+            },
+            "name": {
+              "type": "string"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Specifies products (and associated models) that the destination can receive. If products are not configured, this can be left blank, and all models will be available to enable."
+              }
+            }
+          }
+        },
+        "TableTenantedRecipientPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/TableTenantedRecipient"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "id_in_provider_system": {
+                  "type": "string",
+                  "description": "ID used in source system for recipient. This field cannot be modified once created."
+                }
+              }
+            }
+          ],
+          "required": ["id", "name", "id_in_provider_system"]
+        },
+        "TableTenantedRecipientPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/TableTenantedRecipient"
+            }
+          ]
+        },
+        "RecipientSourceCredential": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true
+            },
+            "source_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "recipient_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "username": {
+              "type": "string",
+              "description": "Username used by recipient to access source. Used for RBAC."
+            },
+            "password": {
+              "type": "string",
+              "description": "Password to use to connect to source. Used for RBAC.",
+              "writeOnly": true
+            }
+          }
+        },
+        "RecipientSourceCredentialPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/RecipientSourceCredential"
+            }
+          ],
+          "required": ["id", "source_id", "recipient_id", "username", "password"]
+        },
+        "RecipientSourceCredentialPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/RecipientSourceCredential"
+            }
+          ]
+        },
+        "BaseWebhook": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true
+            },
+            "name": {
+              "type": "string",
+              "description": "Descriptive name for webhook."
+            },
+            "vendor": {
+              "type": "string",
+              "enum": ["generic_post", "generic_get", "slack", "pagerduty"],
+              "description": "Webhook destination type. generic_post will deliver payload data as JSON, generic_get will deliver payload data as query params."
+            }
+          }
+        },
+        "GenericWebhook": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseWebhook"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Destination URL to deliver webhook."
+                },
+                "api_key": {
+                  "type": "string",
+                  "description": "Optional API key if required by the webhook destination.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "GenericWebhookPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/GenericWebhook"
+            }
+          ],
+          "required": ["id", "name", "vendor", "url"]
+        },
+        "GenericWebhookPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/GenericWebhook"
+            }
+          ]
+        },
+        "PagerDutyWebhook": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseWebhook"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "api_key": {
+                  "type": "string",
+                  "description": "Integration Key provided by PagerDuty in the \"Events API Overview\" of the service configured to monitor these events.",
+                  "writeOnly": true
+                }
+              }
+            }
+          ]
+        },
+        "PagerDutyWebhookPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PagerDutyWebhook"
+            }
+          ],
+          "required": ["id", "name", "vendor", "api_key"]
+        },
+        "PagerDutyWebhookPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PagerDutyWebhook"
+            }
+          ]
+        },
+        "SlackWebhook": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BaseWebhook"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Destination URL provided by Slack in the form 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'."
+                }
+              }
+            }
+          ]
+        },
+        "SlackWebhookPost": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SlackWebhook"
+            }
+          ],
+          "required": ["id", "name", "vendor", "url"]
+        },
+        "SlackWebhookPatch": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SlackWebhook"
+            }
+          ]
+        },
+        "Transfer": {
+          "type": "object",
+          "required": [
+            "id",
+            "source_id",
+            "destination_id",
+            "status",
+            "models",
+            "log",
+            "submitted_at",
+            "started_at",
+            "ended_at"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "source_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "destination_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "RUNNING",
+                "SUCCESS",
+                "PARTIAL_FAILURE",
+                "ERROR"
+              ],
+              "description": "Status of transfer."
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "log": {
+              "type": "string"
+            },
+            "submitted_at": {
+              "type": "string"
+            },
+            "started_at": {
+              "type": "string"
+            },
+            "ended_at": {
+              "type": "string"
+            },
+            "rows_transferred": {
+              "type": "integer"
+            },
+            "volume_transferred_mb": {
+              "type": "number"
+            }
+          }
+        },
+        "LogEvent": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "created_at": {
+              "type": "string"
+            },
+            "event_type": {
+              "type": "string",
+              "enum": [
+                "DESTINATION_ADD",
+                "DESTINATION_DELETE",
+                "DESTINATION_UPDATE",
+                "ENABLE_ALL",
+                "FULL_REFRESH_START",
+                "FULL_REFRESH_END",
+                "MAGIC_LINK_CREATE",
+                "MAGIC_LINK_DELETE",
+                "TRANSFER_CLEANUP",
+                "TRANSFER_REQUEST",
+                "TRANSFER_REQUEST_ENQUEUED",
+                "TRANSFER_REQUEST_DEQUEUED",
+                "MODEL_TRANSFER_SUCCESS",
+                "MODEL_TRANSFER_ERROR",
+                "ORG_TRANSFER_START",
+                "ORG_TRANSFER_END",
+                "PAUSE_ALL",
+                "SOURCE_ADD",
+                "SOURCE_DELETE",
+                "SOURCE_UPDATE"
+              ]
+            },
+            "resource_id": {
+              "type": "string"
+            }
+          }
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "parameters": {
+        "DestinationId": {
+          "name": "destination_id",
+          "in": "path",
+          "required": true,
+          "description": "Destination id.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "SourceId": {
+          "name": "source_id",
+          "in": "path",
+          "required": true,
+          "description": "Source id.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "RecipientId": {
+          "name": "recipient_id",
+          "in": "path",
+          "required": true,
+          "description": "Recipient id.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "RecipientSourceCredentialId": {
+          "name": "recipient_source_credential_id",
+          "in": "path",
+          "required": true,
+          "description": "RecipientSourceCredential id.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "TransferId": {
+          "name": "transfer_id",
+          "in": "path",
+          "required": true,
+          "description": "Transfer id.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "MagicLinkId": {
+          "name": "magic_link_id",
+          "in": "path",
+          "required": true,
+          "description": "Magic Link id.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "ModelId": {
+          "name": "model_id",
+          "in": "path",
+          "required": true,
+          "description": "Model ID.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "ModelName": {
+          "name": "q",
+          "in": "query",
+          "description": "If a model name is specified, results will be filtered by the given name.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "ProductId": {
+          "name": "product_id",
+          "in": "path",
+          "required": true,
+          "description": "Product ID.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "ProductName": {
+          "name": "q",
+          "in": "query",
+          "description": "If a product name is specified, results will be filtered by the given name.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "DestinationIdInProviderSystem": {
+          "name": "id_in_provider_system",
+          "in": "query",
+          "description": "Id of the organization to whom this destination belongs in the provider's system. In other words, likely some kind of org_id or customer_id in your system.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "DestinationIdQueryFilter": {
+          "name": "destination_id",
+          "in": "query",
+          "description": "If specified, returns only transfers that were made to the given destination.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "RecipientIdInProviderSystem": {
+          "name": "id_in_provider_system",
+          "in": "query",
+          "description": "Id of the organization to whom this recipient corresponds in the provider's system. In other words, likely some kind of org_id or customer_id in your system.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "TransferStatusQueryFilter": {
+          "name": "status",
+          "in": "query",
+          "description": "If specified, returns only transfers that have the given status.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "TransferCount": {
+          "name": "count",
+          "in": "query",
+          "description": "Number of transfers to return.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "LogCount": {
+          "name": "count",
+          "in": "query",
+          "description": "Number of logs to return.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "LogOffset": {
+          "name": "offset",
+          "in": "query",
+          "description": "Number of logs to offset the results by.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "LogMinTime": {
+          "name": "min_time",
+          "in": "query",
+          "description": "An integer Unix timestamp, filtering logs which occurred on or after the specified time.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "LogType": {
+          "name": "event_type",
+          "in": "query",
+          "description": "Type of logs to filter for.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "DestinationIds": {
+          "name": "destinations",
+          "in": "query",
+          "description": "Destination ID (or comma-separated list of destination IDs).",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "StartDate": {
+          "name": "start",
+          "in": "query",
+          "description": "Start date of report (in the format YYYY-MM-DD).",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2023-01-01"
+          }
+        },
+        "EndDate": {
+          "name": "end",
+          "in": "query",
+          "description": "End date of report (in the format YYYY-MM-DD).",
+          "schema": {
+            "type": "string",
+            "format": "date",
+            "example": "2023-01-14"
+          }
+        },
+        "WebhookId": {
+          "name": "webhook_id",
+          "in": "path",
+          "required": true,
+          "description": "Id of the target webhook resource.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      },
+      "responses": {
+        "401Unauthorized": {
+          "description": "Unauthorized"
+        },
+        "404NotFound": {
+          "description": "The specified resource was not found"
+        },
+        "500ServerError": {
+          "description": "An unknown error occured"
+        },
+        "GenericError": {
+          "description": "An error occured",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "securitySchemes": {
+        "ApiKeyAuth": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "X-API-KEY"
+        }
+      }
+    },
+    "x-readme": {
+      "explorer-enabled": true,
+      "proxy-enabled": false,
+      "samples-enabled": true
+    }
+  }

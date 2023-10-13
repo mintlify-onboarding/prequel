@@ -1,15 +1,15 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "",
+  "name": "Prequel",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/dark.png",
+    "light": "/logo/light.png"
   },
   "favicon": "/favicon.png",
   "colors": {
-    "primary": "#9563FF",
-    "light": "#AE87FF",
-    "dark": "#0D001D"
+    "primary": "#3FEB81",
+    "light": "#64FB9E",
+    "dark": "#3FEB81"
   },
   "topbarLinks": [
     {
@@ -53,12 +53,128 @@
       ]
     },
     {
-      "group": "API Reference",
-      "pages": []
+      "group": "Health",
+      "pages": [
+        "api-reference/health/api-status"
+      ]
+    },
+    {
+      "group": "Sources",
+      "pages": [
+        "api-reference/sources/get-sources",
+        "api-reference/sources/add-source",
+        "api-reference/sources/delete-source",
+        "api-reference/sources/update-source",
+        "api-reference/sources/test-source-connection"
+      ]
+    },
+    {
+      "group": "Destinations",
+      "pages": [
+        "api-reference/destinations/get-destinations",
+        "api-reference/destinations/add-destination",
+        "api-reference/destinations/delete-destination",
+        "api-reference/destinations/update-destination",
+        "api-reference/destinations/get-destination-vendors-&-fields",
+        "api-reference/destinations/test-destination-connection"
+      ]
+    },
+    {
+      "group": "Recipients",
+      "pages": [
+        "api-reference/recipients/get-recipients",
+        "api-reference/recipients/add-recipient",
+        "api-reference/recipients/delete-recipient",
+        "api-reference/recipients/update-recipient"
+      ]
+    },
+    {
+      "group": "Recipient Source Credentials",
+      "pages": [
+        "api-reference/recipient-source-credentials/get-recipient-source-credentials",
+        "api-reference/recipient-source-credentials/add-recipient_source_credential",
+        "api-reference/recipient-source-credentials/delete-recipient_source_credential",
+        "api-reference/recipient-source-credentials/update-recipient_source_credential",
+        "api-reference/recipient-source-credentials/test-recipient-source-credential-connection"
+      ]
+    },
+    {
+      "group": "Webhooks",
+      "pages": [
+        "api-reference/webhooks/get-webhooks",
+        "api-reference/webhooks/add-new-webhook",
+        "api-reference/webhooks/delete-webhook",
+        "api-reference/webhooks/update-webhook"
+      ]
+    },
+    {
+      "group": "Auth",
+      "pages": [
+        "api-reference/auth/generate-service-account",
+        "api-reference/auth/generate-ssh-key",
+        "api-reference/auth/generate-scoped-auth-token"
+      ]
+    },
+    {
+      "group": "Transfers",
+      "pages": [
+        "api-reference/transfers/begin-transfer",
+        "api-reference/transfers/get-transfers",
+        "api-reference/transfers/get-transfer"
+      ]
+    },
+    {
+      "group": "Reports",
+      "pages": [
+        "api-reference/reports/get-transfer-reports"
+      ]
+    },
+    {
+      "group": "Actions",
+      "pages": [
+        "api-reference/actions/set-all-destinations-to-\"enabled\"-state",
+        "api-reference/actions/set-all-destinations-to-\"paused\"-state"
+      ]
+    },
+    {
+      "group": "Magic Links",
+      "pages": [
+        "api-reference/magic-links/get-magic-links",
+        "api-reference/magic-links/create-new-magic-link",
+        "api-reference/magic-links/delete-magic-link"
+      ]
+    },
+    {
+      "group": "Monitoring & Logging",
+      "pages": [
+        "api-reference/monitoring-&-logging/get-event-logs"
+      ]
+    },
+    {
+      "group": "Models",
+      "pages": [
+        "api-reference/models/get-models",
+        "api-reference/models/add-model",
+        "api-reference/models/get-model",
+        "api-reference/models/delete-model",
+        "api-reference/models/update-model",
+        "api-reference/models/validate-model"
+      ]
+    },
+    {
+      "group": "Products",
+      "pages": [
+        "api-reference/products/get-products",
+        "api-reference/products/add-product",
+        "api-reference/products/get-product",
+        "api-reference/products/delete-product",
+        "api-reference/products/update-product",
+        "api-reference/products/validate-product"
+      ]
     }
   ],
   "footerSocials": {
-    "twitter": "",
-    "linkedin": ""
+    "twitter": "https://twitter.com/prequel_co?lang=en",
+    "linkedin": "https://www.linkedin.com/company/prequel-co/"
   }
 }
